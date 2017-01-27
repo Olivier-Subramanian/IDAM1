@@ -20,7 +20,7 @@
       "metadata": {
         "description": "The name of the new storage account created to store the VMs disks"
       },
-      "defaultValue": "gdsidam"
+      "defaultValue": "gdsidam007"
     },
     "storageAccountType": {
       "type": "string",
@@ -36,457 +36,460 @@
       "defaultValue": "Standard_LRS"
     },
     "diagnosticsStorageAccountName": {
-      "type": "string"
-    },
-    "diagnosticStorageAccountType": {
       "type": "string",
-      "allowedValues": [
-        "Standard_LRS",
-        "Standard_GRS",
-        "Standard_RAGRS",
-        "Premium_LRS"
-      ],
       "metadata": {
-        "description": "The type of the Diagnostic Storage Account created"
+        "description": "The name of the new diagnostic storage account created to store the VMs disks"
       },
-      "defaultValue": "Standard_LRS"
+      "defaultValue": "gdsidam010"
     },
-    "location": {
-      "type": "string"
-    },
-    "networkInterfaceNameFront1": {
-      "type": "string",
-      "metadata": {
-        "description": "The name of the NIC attached to the new VM1 in the front Subnet"
+      "diagnosticStorageAccountType": {
+        "type": "string",
+        "allowedValues": [
+          "Standard_LRS",
+          "Standard_GRS",
+          "Standard_RAGRS",
+          "Premium_LRS"
+        ],
+        "metadata": {
+          "description": "The type of the Diagnostic Storage Account created"
+        },
+        "defaultValue": "Standard_LRS"
       },
-      "defaultValue": "nicf1"
-    },
-    "networkInterfaceNameBack1": {
-      "type": "string",
-      "metadata": {
-        "description": "The name of the NIC attached to the new VM1 in the back Subnet"
+      "location": {
+        "type": "string"
       },
-      "defaultValue": "nicb1"
-    },
-    "networkInterfaceNameFront2": {
-      "type": "string",
-      "metadata": {
-        "description": "The name of the NIC attached to the new VM2 in the front Subnet"
+      "networkInterfaceNameFront1": {
+        "type": "string",
+        "metadata": {
+          "description": "The name of the NIC attached to the new VM1 in the front Subnet"
+        },
+        "defaultValue": "nicf1"
       },
-      "defaultValue": "nicf2"
-    },
-    "networkInterfaceNameBack2": {
-      "type": "string",
-      "metadata": {
-        "description": "The name of the NIC attached to the new VM2 in the back Subnet"
+      "networkInterfaceNameBack1": {
+        "type": "string",
+        "metadata": {
+          "description": "The name of the NIC attached to the new VM1 in the back Subnet"
+        },
+        "defaultValue": "nicb1"
       },
-      "defaultValue": "nicb2"
-    },
-    "networkInterfaceNameFront3": {
-      "type": "string",
-      "metadata": {
-        "description": "The name of the NIC attached to the new VM3 in the front Subnet"
+      "networkInterfaceNameFront2": {
+        "type": "string",
+        "metadata": {
+          "description": "The name of the NIC attached to the new VM2 in the front Subnet"
+        },
+        "defaultValue": "nicf2"
       },
-      "defaultValue": "nicf3"
-    },
-    "networkInterfaceNameBack3": {
-      "type": "string",
-      "metadata": {
-        "description": "The name of the NIC attached to the new VM3 in the back Subnet"
+      "networkInterfaceNameBack2": {
+        "type": "string",
+        "metadata": {
+          "description": "The name of the NIC attached to the new VM2 in the back Subnet"
+        },
+        "defaultValue": "nicb2"
       },
-      "defaultValue": "nicb3"
-    },
-    "networkInterfaceNameFront4": {
-      "type": "string",
-      "metadata": {
-        "description": "The name of the NIC attached to the new VM4 in the front Subnet"
+      "networkInterfaceNameFront3": {
+        "type": "string",
+        "metadata": {
+          "description": "The name of the NIC attached to the new VM3 in the front Subnet"
+        },
+        "defaultValue": "nicf3"
       },
-      "defaultValue": "nicf4"
-    },
-    "networkInterfaceNameBack4": {
-      "type": "string",
-      "metadata": {
-        "description": "The name of the NIC attached to the new VM4 in the back Subnet"
+      "networkInterfaceNameBack3": {
+        "type": "string",
+        "metadata": {
+          "description": "The name of the NIC attached to the new VM3 in the back Subnet"
+        },
+        "defaultValue": "nicb3"
       },
-      "defaultValue": "nicb4"
-    },
-    "networkInterfaceNameBack5": {
-      "type": "string",
-      "metadata": {
-        "description": "The name of the NIC attached to the new VM5 in the back Subnet"
+      "networkInterfaceNameFront4": {
+        "type": "string",
+        "metadata": {
+          "description": "The name of the NIC attached to the new VM4 in the front Subnet"
+        },
+        "defaultValue": "nicf4"
       },
-      "defaultValue": "nicb5"
-    },
-    "networkInterfaceNameBack6": {
-      "type": "string",
-      "metadata": {
-        "description": "The name of the NIC attached to the new VM6 in the back Subnet"
+      "networkInterfaceNameBack4": {
+        "type": "string",
+        "metadata": {
+          "description": "The name of the NIC attached to the new VM4 in the back Subnet"
+        },
+        "defaultValue": "nicb4"
       },
-      "defaultValue": "nicb6"
-    },
-    "networkInterfaceNameFront7": {
-      "type": "string",
-      "metadata": {
-        "description": "The name of the NIC attached to the new VM7 in the Front Subnet"
+      "networkInterfaceNameBack5": {
+        "type": "string",
+        "metadata": {
+          "description": "The name of the NIC attached to the new VM5 in the back Subnet"
+        },
+        "defaultValue": "nicb5"
       },
-      "defaultValue": "nicf7"
-    },
-
-    "networkInterfaceNameBack8": {
-      "type": "string",
-      "metadata": {
-        "description": "The name of the NIC attached to the new VM8 in the back Subnet"
+      "networkInterfaceNameBack6": {
+        "type": "string",
+        "metadata": {
+          "description": "The name of the NIC attached to the new VM6 in the back Subnet"
+        },
+        "defaultValue": "nicb6"
       },
-      "defaultValue": "nicb8"
-    },
-    "networkSecurityGroupNameFront": {
-      "type": "string"
-    },
-    "networkSecurityGroupNameBack": {
-      "type": "string"
-    },
-    "publicIpAddressName1": {
-      "type": "string",
-      "metadata": {
-        "description": "The name of the public IP address used by the VM"
+      "networkInterfaceNameFront7": {
+        "type": "string",
+        "metadata": {
+          "description": "The name of the NIC attached to the new VM7 in the Front Subnet"
+        },
+        "defaultValue": "nicf7"
       },
-      "defaultValue": "pip1"
-    },
-    "publicIpAddressType1": {
-      "type": "string",
-      "allowedValues": [
-        "Dynamic",
-        "Static"
-      ],
-      "metadata": {
-        "description": "The type of the public IP address used by the VM"
+      "networkInterfaceNameBack8": {
+        "type": "string",
+        "metadata": {
+          "description": "The name of the NIC attached to the new VM8 in the back Subnet"
+        },
+        "defaultValue": "nicb8"
       },
-      "defaultValue": "Static"
-    },
-    "publicIpAddressName2": {
-      "type": "string",
-      "metadata": {
-        "description": "The name of the public IP address used by the VM"
+      "networkSecurityGroupNameFront": {
+        "type": "string"
       },
-      "defaultValue": "pip2"
-    },
-    "publicIpAddressType2": {
-      "type": "string",
-      "allowedValues": [
-        "Dynamic",
-        "Static"
-      ],
-      "metadata": {
-        "description": "The type of the public IP address used by the VM"
+      "networkSecurityGroupNameBack": {
+        "type": "string"
       },
-      "defaultValue": "Static"
-    },
-    "publicIpAddressName3": {
-      "type": "string",
-      "metadata": {
-        "description": "The name of the public IP address used by the VM"
+      "publicIpAddressName1": {
+        "type": "string",
+        "metadata": {
+          "description": "The name of the public IP address used by the VM"
+        },
+        "defaultValue": "pip1"
       },
-      "defaultValue": "pip3"
-    },
-    "publicIpAddressType3": {
-      "type": "string",
-      "allowedValues": [
-        "Dynamic",
-        "Static"
-      ],
-      "metadata": {
-        "description": "The type of the public IP address used by the VM"
+      "publicIpAddressType1": {
+        "type": "string",
+        "allowedValues": [
+          "Dynamic",
+          "Static"
+        ],
+        "metadata": {
+          "description": "The type of the public IP address used by the VM"
+        },
+        "defaultValue": "Static"
       },
-      "defaultValue": "Static"
-    },
-    "publicIpAddressName4": {
-      "type": "string",
-      "metadata": {
-        "description": "The name of the public IP address used by the VM"
+      "publicIpAddressName2": {
+        "type": "string",
+        "metadata": {
+          "description": "The name of the public IP address used by the VM"
+        },
+        "defaultValue": "pip2"
       },
-      "defaultValue": "pip4"
-    },
-    "publicIpAddressType4": {
-      "type": "string",
-      "allowedValues": [
-        "Dynamic",
-        "Static"
-      ],
-      "metadata": {
-        "description": "The type of the public IP address used by the VM"
+      "publicIpAddressType2": {
+        "type": "string",
+        "allowedValues": [
+          "Dynamic",
+          "Static"
+        ],
+        "metadata": {
+          "description": "The type of the public IP address used by the VM"
+        },
+        "defaultValue": "Static"
       },
-      "defaultValue": "Static"
-    },
-    "publicIpAddressName7": {
-      "type": "string",
-      "metadata": {
-        "description": "The name of the public IP address used by the VM"
+      "publicIpAddressName3": {
+        "type": "string",
+        "metadata": {
+          "description": "The name of the public IP address used by the VM"
+        },
+        "defaultValue": "pip3"
       },
-      "defaultValue": "pip7"
-    },
-    "publicIpAddressType7": {
-      "type": "string",
-      "allowedValues": [
-        "Dynamic",
-        "Static"
-      ],
-      "metadata": {
-        "description": "The type of the public IP address used by the VM"
+      "publicIpAddressType3": {
+        "type": "string",
+        "allowedValues": [
+          "Dynamic",
+          "Static"
+        ],
+        "metadata": {
+          "description": "The type of the public IP address used by the VM"
+        },
+        "defaultValue": "Static"
       },
-      "defaultValue": "Static"
-    },
-    "subnetName1": {
-      "type": "string",
-      "defaultValue": "frontsubnet",
-      "metadata": {
-        "description": "Name for the front end subnet."
+      "publicIpAddressName4": {
+        "type": "string",
+        "metadata": {
+          "description": "The name of the public IP address used by the VM"
+        },
+        "defaultValue": "pip4"
+      },
+      "publicIpAddressType4": {
+        "type": "string",
+        "allowedValues": [
+          "Dynamic",
+          "Static"
+        ],
+        "metadata": {
+          "description": "The type of the public IP address used by the VM"
+        },
+        "defaultValue": "Static"
+      },
+      "publicIpAddressName7": {
+        "type": "string",
+        "metadata": {
+          "description": "The name of the public IP address used by the VM"
+        },
+        "defaultValue": "pip7"
+      },
+      "publicIpAddressType7": {
+        "type": "string",
+        "allowedValues": [
+          "Dynamic",
+          "Static"
+        ],
+        "metadata": {
+          "description": "The type of the public IP address used by the VM"
+        },
+        "defaultValue": "Static"
+      },
+      "subnetName1": {
+        "type": "string",
+        "defaultValue": "frontsubnet",
+        "metadata": {
+          "description": "Name for the front end subnet."
+        }
+      },
+      "subnetName1prefix": {
+        "type": "string",
+        "defaultValue": "10.0.1.0/24",
+        "metadata": {
+          "description": "CIDR address prefix for the front end subnet."
+        }
+      },
+      "subnetName2": {
+        "type": "string",
+        "defaultValue": "backsubnet",
+        "metadata": {
+          "description": "Name for the back end subnet."
+        }
+      },
+      "subnetName2prefix": {
+        "type": "string",
+        "defaultValue": "10.0.2.0/24",
+        "metadata": {
+          "description": "CIDR address prefix for the back end subnet."
+        }
+      },
+      "virtualMachineName1": {
+        "type": "string",
+        "metadata": {
+          "description": "The computer name of the VM1"
+        },
+        "defaultValue": "RRAS"
+      },
+      "virtualMachineSize1": {
+        "type": "string",
+        "metadata": {
+          "description": "The size of the VM Created"
+        },
+        "defaultValue": "Standard_DS2_v2"
+      },
+      "virtualMachineName2": {
+        "type": "string",
+        "metadata": {
+          "description": "The computer name of the VM1"
+        },
+        "defaultValue": "Proxy"
+      },
+      "virtualMachineSize2": {
+        "type": "string",
+        "metadata": {
+          "description": "The size of the VM Created"
+        },
+        "defaultValue": "Standard_DS2_v2"
+      },
+      "virtualMachineName3": {
+        "type": "string",
+        "metadata": {
+          "description": "The computer name of the VM1"
+        },
+        "defaultValue": "SCCM"
+      },
+      "virtualMachineSize3": {
+        "type": "string",
+        "metadata": {
+          "description": "The size of the VM Created"
+        },
+        "defaultValue": "Standard_DS2_v2"
+      },
+      "virtualMachineName4": {
+        "type": "string",
+        "metadata": {
+          "description": "The computer name of the VM1"
+        },
+        "defaultValue": "ADDS"
+      },
+      "virtualMachineSize4": {
+        "type": "string",
+        "metadata": {
+          "description": "The size of the VM Created"
+        },
+        "defaultValue": "Standard_DS2_v2"
+      },
+      "virtualMachineName5": {
+        "type": "string",
+        "metadata": {
+          "description": "The computer name of the VM1"
+        },
+        "defaultValue": "MBAM"
+      },
+      "virtualMachineSize5": {
+        "type": "string",
+        "metadata": {
+          "description": "The size of the VM Created"
+        },
+        "defaultValue": "Standard_DS2_v2"
+      },
+      "virtualMachineName6": {
+        "type": "string",
+        "metadata": {
+          "description": "The computer name of the VM1"
+        },
+        "defaultValue": "PKI"
+      },
+      "virtualMachineSize6": {
+        "type": "string",
+        "metadata": {
+          "description": "The size of the VM Created"
+        },
+        "defaultValue": "Standard_DS2_v2"
+      },
+      "virtualMachineName7": {
+        "type": "string",
+        "metadata": {
+          "description": "The computer name of the VM1"
+        },
+        "defaultValue": "RDS"
+      },
+      "virtualMachineSize7": {
+        "type": "string",
+        "metadata": {
+          "description": "The size of the VM Created"
+        },
+        "defaultValue": "Standard_DS2_v2"
+      },
+      "virtualMachineName8": {
+        "type": "string",
+        "metadata": {
+          "description": "The computer name of the VM1"
+        },
+        "defaultValue": "ADC"
+      },
+      "virtualMachineSize8": {
+        "type": "string",
+        "metadata": {
+          "description": "The size of the VM Created"
+        },
+        "defaultValue": "Standard_DS2_v2"
+      },
+      "rrasBackendIpAddress": {
+        "type": "string",
+        "defaultValue": "10.0.2.4",
+        "metadata": {
+          "description": "IP address for RRAS backend subnet NIC."
+        }
+      },
+      "proxyBackendIpAddress": {
+        "type": "string",
+        "defaultValue": "10.0.2.5",
+        "metadata": {
+          "description": "IP address for Proxy backend subnet NIC."
+        }
+      },
+      "VMSize": {
+        "type": "string",
+        "allowedValues": [
+          "Standard_D1",
+          "Standard_DS1",
+          "Standard_D2",
+          "Standard_DS2",
+          "Standard_D3",
+          "Standard_DS3",
+          "Standard_D4",
+          "Standard_DS4",
+          "Standard_D11",
+          "Standard_DS11",
+          "Standard_D12",
+          "Standard_DS12",
+          "Standard_D13",
+          "Standard_DS13",
+          "Standard_D14",
+          "Standard_DS14",
+          "Standard_D1_v2",
+          "Standard_DS1_v2",
+          "Standard_D2_v2",
+          "Standard_DS2_v2",
+          "Standard_D3_v2",
+          "Standard_DS3_v2",
+          "Standard_D4_v2",
+          "Standard_DS4_v2",
+          "Standard_D11_v2",
+          "Standard_DS11_v2",
+          "Standard_D12_v2",
+          "Standard_DS12_v2",
+          "Standard_D13_v2",
+          "Standard_DS13_v2",
+          "Standard_D14_v2",
+          "Standard_DS14_v2"
+        ],
+        "metadata": {
+          "description": "The size of the VM Created"
+        },
+        "defaultValue": "Standard_DS2_v2"
+      },
+      "imagePublisher": {
+        "type": "string",
+        "defaultValue": "MicrosoftWindowsServer",
+        "metadata": {
+          "description": "Image Publisher"
+        }
+      },
+      "imageOffer": {
+        "type": "string",
+        "defaultValue": "WindowsServer",
+        "metadata": {
+          "description": "Image Offer"
+        }
+      },
+      "imageSKU": {
+        "type": "string",
+        "defaultValue": "2016-Datacenter",
+        "metadata": {
+          "description": "Image SKU"
+        }
+      },
+      "RDPPort": {
+        "type": "int",
+        "metadata": {
+          "description": "The public RDP port for the PDC VM"
+        },
+        "defaultValue": 3389
+      },
+      "virtualNetworkName": {
+        "type": "string",
+        "metadata": {
+          "description": "The name of the Virtual Network to Create"
+        },
+        "defaultValue": "gdsidam-vnet"
+      },
+      "virtualNetworkAddressRange": {
+        "type": "string",
+        "metadata": {
+          "description": "The address range of the new VNET in CIDR format"
+        },
+        "defaultValue": "10.0.0.0/16"
+      },
+      "frontEndRouteTableName": {
+        "type": "string",
+        "defaultValue": "UDR-FrontEnd",
+        "metadata": {
+          "description": "Name for front end subnet route table."
+        }
+      },
+      "backEndRouteTableName": {
+        "type": "string",
+        "defaultValue": "UDR-BackEnd",
+        "metadata": {
+          "description": "Name for back end subnet route table."
+        }
       }
     },
-    "subnetName1prefix": {
-      "type": "string",
-      "defaultValue": "10.0.1.0/24",
-      "metadata": {
-        "description": "CIDR address prefix for the front end subnet."
-      }
-    },
-    "subnetName2": {
-      "type": "string",
-      "defaultValue": "backsubnet",
-      "metadata": {
-        "description": "Name for the back end subnet."
-      }
-    },
-    "subnetName2prefix": {
-      "type": "string",
-      "defaultValue": "10.0.2.0/24",
-      "metadata": {
-        "description": "CIDR address prefix for the back end subnet."
-      }
-    },
-    "virtualMachineName1": {
-      "type": "string",
-      "metadata": {
-        "description": "The computer name of the VM1"
-      },
-      "defaultValue": "RRAS"
-    },
-    "virtualMachineSize1": {
-      "type": "string",
-      "metadata": {
-        "description": "The size of the VM Created"
-      },
-      "defaultValue": "Standard_DS2_v2"
-    },
-    "virtualMachineName2": {
-      "type": "string",
-      "metadata": {
-        "description": "The computer name of the VM1"
-      },
-      "defaultValue": "Proxy"
-    },
-    "virtualMachineSize2": {
-      "type": "string",
-      "metadata": {
-        "description": "The size of the VM Created"
-      },
-      "defaultValue": "Standard_DS2_v2"
-    },
-    "virtualMachineName3": {
-      "type": "string",
-      "metadata": {
-        "description": "The computer name of the VM1"
-      },
-      "defaultValue": "SCCM"
-    },
-    "virtualMachineSize3": {
-      "type": "string",
-      "metadata": {
-        "description": "The size of the VM Created"
-      },
-      "defaultValue": "Standard_DS2_v2"
-    },
-    "virtualMachineName4": {
-      "type": "string",
-      "metadata": {
-        "description": "The computer name of the VM1"
-      },
-      "defaultValue": "ADDS"
-    },
-    "virtualMachineSize4": {
-      "type": "string",
-      "metadata": {
-        "description": "The size of the VM Created"
-      },
-      "defaultValue": "Standard_DS2_v2"
-    },
-    "virtualMachineName5": {
-      "type": "string",
-      "metadata": {
-        "description": "The computer name of the VM1"
-      },
-      "defaultValue": "MBAM"
-    },
-    "virtualMachineSize5": {
-      "type": "string",
-      "metadata": {
-        "description": "The size of the VM Created"
-      },
-      "defaultValue": "Standard_DS2_v2"
-    },
-    "virtualMachineName6": {
-      "type": "string",
-      "metadata": {
-        "description": "The computer name of the VM1"
-      },
-      "defaultValue": "PKI"
-    },
-    "virtualMachineSize6": {
-      "type": "string",
-      "metadata": {
-        "description": "The size of the VM Created"
-      },
-      "defaultValue": "Standard_DS2_v2"
-    },
-    "virtualMachineName7": {
-      "type": "string",
-      "metadata": {
-        "description": "The computer name of the VM1"
-      },
-      "defaultValue": "RDS"
-    },
-    "virtualMachineSize7": {
-      "type": "string",
-      "metadata": {
-        "description": "The size of the VM Created"
-      },
-      "defaultValue": "Standard_DS2_v2"
-    },
-    "virtualMachineName8": {
-      "type": "string",
-      "metadata": {
-        "description": "The computer name of the VM1"
-      },
-      "defaultValue": "ADC"
-    },
-    "virtualMachineSize8": {
-      "type": "string",
-      "metadata": {
-        "description": "The size of the VM Created"
-      },
-      "defaultValue": "Standard_DS2_v2"
-    },
-    "rrasBackendIpAddress": {
-      "type": "string",
-      "defaultValue": "10.0.2.4",
-      "metadata": {
-        "description": "IP address for RRAS backend subnet NIC."
-      }
-    },
-    "proxyBackendIpAddress": {
-      "type": "string",
-      "defaultValue": "10.0.2.5",
-      "metadata": {
-        "description": "IP address for Proxy backend subnet NIC."
-      }
-    },
-    "VMSize": {
-      "type": "string",
-      "allowedValues": [
-        "Standard_D1",
-        "Standard_DS1",
-        "Standard_D2",
-        "Standard_DS2",
-        "Standard_D3",
-        "Standard_DS3",
-        "Standard_D4",
-        "Standard_DS4",
-        "Standard_D11",
-        "Standard_DS11",
-        "Standard_D12",
-        "Standard_DS12",
-        "Standard_D13",
-        "Standard_DS13",
-        "Standard_D14",
-        "Standard_DS14",
-        "Standard_D1_v2",
-        "Standard_DS1_v2",
-        "Standard_D2_v2",
-        "Standard_DS2_v2",
-        "Standard_D3_v2",
-        "Standard_DS3_v2",
-        "Standard_D4_v2",
-        "Standard_DS4_v2",
-        "Standard_D11_v2",
-        "Standard_DS11_v2",
-        "Standard_D12_v2",
-        "Standard_DS12_v2",
-        "Standard_D13_v2",
-        "Standard_DS13_v2",
-        "Standard_D14_v2",
-        "Standard_DS14_v2"
-      ],
-      "metadata": {
-        "description": "The size of the VM Created"
-      },
-      "defaultValue": "Standard_DS2_v2"
-    },
-    "imagePublisher": {
-      "type": "string",
-      "defaultValue": "MicrosoftWindowsServer",
-      "metadata": {
-        "description": "Image Publisher"
-      }
-    },
-    "imageOffer": {
-      "type": "string",
-      "defaultValue": "WindowsServer",
-      "metadata": {
-        "description": "Image Offer"
-      }
-    },
-    "imageSKU": {
-      "type": "string",
-      "defaultValue": "2016-Datacenter",
-      "metadata": {
-        "description": "Image SKU"
-      }
-    },
-    "RDPPort": {
-      "type": "int",
-      "metadata": {
-        "description": "The public RDP port for the PDC VM"
-      },
-      "defaultValue": 3389
-    },
-    "virtualNetworkName": {
-      "type": "string",
-      "metadata": {
-        "description": "The name of the Virtual Network to Create"
-      },
-      "defaultValue": "gdsidam-vnet"
-    },
-    "virtualNetworkAddressRange": {
-      "type": "string",
-      "metadata": {
-        "description": "The address range of the new VNET in CIDR format"
-      },
-      "defaultValue": "10.0.0.0/16"
-    },
-    "frontEndRouteTableName": {
-      "type": "string",
-      "defaultValue": "UDR-FrontEnd",
-      "metadata": {
-        "description": "Name for front end subnet route table."
-      }
-    },
-    "backEndRouteTableName": {
-      "type": "string",
-      "defaultValue": "UDR-BackEnd",
-      "metadata": {
-        "description": "Name for back end subnet route table."
-      }
-    }
-  },
   "variables": {
     "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
     "frontEndSubnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetName1'))]",
@@ -960,8 +963,10 @@
       "apiVersion": "[variables('apiVer')]",
       "location": "[parameters('location')]",
       "dependsOn": [
+        "apiVersion",
+        "[variables('apiVer')]",
         "[concat('Microsoft.Network/publicIpAddresses/', parameters('publicIpAddressName1'))]",
-        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameFront'))]"
+        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameFront'))]",
       ],
       "properties": {
         "ipConfigurations": [
@@ -974,6 +979,9 @@
               "privateIPAllocationMethod": "Dynamic",
               "publicIpAddress": {
                 "id": "[resourceId(resourceGroup(),'Microsoft.Network/publicIpAddresses', parameters('publicIpAddressName1'))]"
+              },
+              "networkSecurityGroup": {
+                "id": "[resourceId(resourceGroup(), 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameFront'))]"
               }
             }
           }
