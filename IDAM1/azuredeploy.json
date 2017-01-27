@@ -966,7 +966,7 @@
         "apiVersion",
         "[variables('apiVer')]",
         "[concat('Microsoft.Network/publicIpAddresses/', parameters('publicIpAddressName1'))]",
-        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameFront'))]",
+        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameFront'))]"
       ],
       "properties": {
         "ipConfigurations": [
