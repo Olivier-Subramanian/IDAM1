@@ -1,6 +1,156 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {
+  "parameters": {
+    "location": {
+      "value": "northeurope"
+    },
+    "adminUsername": {
+      "value": "demouser"
+    },
+    "storageAccountName": {
+      "value": "gdsidam007"
+    },
+    "virtualNetworkName": {
+      "value": "gdsidam-vnet"
+    },
+    "adminPassword": {
+      "value": "demo@password1"
+    },
+    "diagnosticsStorageAccountName": {
+      "value": "gdsidam010"
+    },
+    "networkInterfaceNameFront1": {
+      "value": "nicf1"
+    },
+    "networkInterfaceNameBack1": {
+      "value": "nicb1"
+    },
+    "networkInterfaceNameFront2": {
+      "value": "nicf2"
+    },
+    "networkInterfaceNameBack2": {
+      "value": "nicb2"
+    },
+    "networkInterfaceNameFront3": {
+      "value": "nicf3"
+    },
+    "networkInterfaceNameBack3": {
+      "value": "nicb3"
+    },
+    "networkInterfaceNameFront4": {
+      "value": "nicf4"
+    },
+    "networkInterfaceNameBack4": {
+      "value": "nicb4"
+    },
+    "networkInterfaceNameBack5": {
+      "value": "nicb5"
+    },
+    "networkInterfaceNameBack6": {
+      "value": "nicb6"
+    },
+    "networkInterfaceNameFront7": {
+      "value": "nicf7"
+    },
+    "networkInterfaceNameBack8": {
+      "value": "nicb8"
+    },
+    "networkSecurityGroupNameFront": {
+      "value": "nsgf"
+    },
+    "networkSecurityGroupNameBack": {
+      "value": "nsgb"
+    },
+    "publicIpAddressName1": {
+      "value": "pip1"
+    },
+    "publicIpAddressType1": {
+      "value": "Static"
+    },
+    "publicIpAddressName2": {
+      "value": "pip2"
+    },
+    "publicIpAddressType2": {
+      "value": "Static"
+    },
+    "publicIpAddressName3": {
+      "value": "pip3"
+    },
+    "publicIpAddressType3": {
+      "value": "Static"
+    },
+    "publicIpAddressName4": {
+      "value": "pip4"
+    },
+    "publicIpAddressType4": {
+      "value": "Static"
+    },
+    "publicIpAddressName7": {
+      "value": "pip7"
+    },
+    "publicIpAddressType7": {
+      "value": "Static"
+    },
+    "subnetName1": {
+      "value": "frontsubnet"
+    },
+    "subnetName2": {
+      "value": "backsubnet"
+    },
+    "subnetName1prefix": {
+      "value": "10.0.1.0/24"
+    },
+    "subnetName2prefix": {
+      "value": "10.0.2.0/24"
+    },
+    "virtualMachineName1": {
+      "value": "RRAS"
+    },
+    "virtualMachineSize1": {
+      "value": "Standard_DS2_v2"
+    },
+    "virtualMachineName2": {
+      "value": "Proxy"
+    },
+    "virtualMachineSize2": {
+      "value": "Standard_DS2_v2"
+    },
+    "virtualMachineName3": {
+      "value": "SCCM"
+    },
+    "virtualMachineSize3": {
+      "value": "Standard_DS2_v2"
+    },
+    "virtualMachineName4": {
+      "value": "ADDS"
+    },
+    "virtualMachineSize4": {
+      "value": "Standard_DS2_v2"
+    },
+    "virtualMachineName5": {
+      "value": "MBAM"
+    },
+    "virtualMachineSize5": {
+      "value": "Standard_DS2_v2"
+    },
+    "virtualMachineName6": {
+      "value": "PKI"
+    },
+    "virtualMachineSize6": {
+      "value": "Standard_DS2_v2"
+    },
+    "virtualMachineName7": {
+      "value": "RDS"
+    },
+    "virtualMachineSize7": {
+      "value": "Standard_DS2_v2"
+    },
+    "virtualMachineName8": {
+      "value": "ADC"
+    },
+    "virtualMachineSize8": {
+      "value": "Standard_DS2_v2"
     }
+  }
 }
