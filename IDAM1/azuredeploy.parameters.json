@@ -151,6 +151,12 @@
     },
     "virtualMachineSize8": {
       "value": "Standard_DS2_v2"
-    }
+    },
+      "nic100Name": {
+          "value": "nic100"
+      },
+      "nicf100Name": {
+          "value": "nicf100"
+      }
   }
 }

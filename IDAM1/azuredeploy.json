@@ -488,20 +488,32 @@
         "metadata": {
           "description": "Name for back end subnet route table."
         }
+      },
+      "nic100Name": {
+          "type": "string",
+          "minLength": 1
+      },
+      "nicf100Name": {
+          "type": "string",
+          "minLength": 1
       }
     },
   "variables": {
     "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
     "frontEndSubnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetName1'))]",
     "backEndSubnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetName2'))]",
-    "apiVer": "2015-06-15"
+    "apiVer": "2015-06-15",
+      "nic100VnetID": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+      "nic100SubnetRef": "[concat(variables('nic100VnetID'), '/subnets/', parameters('subnetName1'))]",
+      "nicf100VnetID": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+      "nicf100SubnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName1'))]"
   },
   "resources": [
     {
       "name": "[parameters('storageAccountName')]",
       "type": "Microsoft.Storage/storageAccounts",
       "location": "[resourceGroup().location]",
-      "apiVersion": "[variables('apiVer')]",
+      "apiVersion": "2015-06-15",
       "dependsOn": [],
       "tags": {
         "displayName": "Storage Account - Simple"
@@ -514,16 +526,603 @@
       "name": "[parameters('diagnosticsStorageAccountName')]",
       "type": "Microsoft.Storage/storageAccounts",
       "location": "[resourceGroup().location]",
-      "apiVersion": "[variables('apiVer')]",
+      "apiVersion": "2015-06-15",
       "properties": {
         "accountType": "[parameters('diagnosticStorageAccountType')]"
       },
       "dependsOn": []
     },
     {
+      "name": "[parameters('networkSecurityGroupNameFront')]",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2015-06-15",
+      "location": "[parameters('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "default-allow-rdp",
+            "properties": {
+              "priority": 1000,
+              "sourceAddressPrefix": "*",
+              "protocol": "TCP",
+              "destinationPortRange": "3389",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*"
+            }
+          },
+          {
+            "name": "http-rule",
+            "properties": {
+              "description": "Allow HTTP",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "80",
+              "sourceAddressPrefix": "Internet",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 101,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "https-rule",
+            "properties": {
+              "description": "Allow HTTPS",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "Internet",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 102,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[parameters('networkSecurityGroupNameBack')]",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2015-06-15",
+      "location": "[parameters('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "default-allow-rdp",
+            "properties": {
+              "priority": 1000,
+              "sourceAddressPrefix": "*",
+              "protocol": "TCP",
+              "destinationPortRange": "3389",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*"
+            }
+          },
+          {
+            "name": "allow-frontend",
+            "properties": {
+              "description": "Allow Front End Subnet",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "[parameters('subnetName1prefix')]",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "block-internet",
+            "properties": {
+              "description": "Block Internet",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "Internet",
+              "access": "Deny",
+              "priority": 100,
+              "direction": "Outbound"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[parameters('virtualNetworkName')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameFront'))]",
+        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameBack'))]",
+        "[concat('Microsoft.Network/routeTables/', parameters('frontEndRouteTableName'))]",
+        "[concat('Microsoft.Network/routeTables/', parameters('backEndRouteTableName'))]"
+      ],
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('virtualNetworkAddressRange')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[parameters('subnetName1')]",
+            "properties": {
+              "addressPrefix": "[parameters('subnetName1prefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameFront'))]"
+              }
+            }
+          },
+          {
+            "name": "[parameters('subnetName2')]",
+            "properties": {
+              "addressPrefix": "[parameters('subnetName2prefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameBack'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/routeTables",
+      "name": "[parameters('backEndRouteTableName')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "Route Table - Back End"
+      },
+      "properties": {
+        "routes": [
+          {
+            "name": "RouteToFrontEnd",
+            "properties": {
+              "addressPrefix": "[parameters('subnetName1prefix')]",
+              "nextHopType": "VirtualAppliance",
+              "nextHopIpAddress": "[parameters('proxyBackendIpAddress')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/routeTables",
+      "name": "[parameters('frontEndRouteTableName')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "UDR - FrontEnd"
+      },
+      "properties": {
+        "routes": [
+          {
+            "name": "RouteToBackEnd",
+            "properties": {
+              "addressPrefix": "[parameters('subnetName2prefix')]",
+              "nextHopType": "VirtualAppliance",
+              "nextHopIpAddress": "[parameters('rrasBackendIpAddress')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[parameters('publicIpAddressName1')]",
+      "type": "Microsoft.Network/publicIpAddresses",
+      "apiVersion": "2015-06-15",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publicIpAllocationMethod": "[parameters('publicIpAddressType1')]"
+      }
+    },
+    {
+      "name": "[parameters('publicIpAddressName2')]",
+      "type": "Microsoft.Network/publicIpAddresses",
+      "apiVersion": "2015-06-15",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publicIpAllocationMethod": "[parameters('publicIpAddressType2')]"
+      }
+    },
+    {
+      "name": "[parameters('publicIpAddressName3')]",
+      "type": "Microsoft.Network/publicIpAddresses",
+      "apiVersion": "2015-06-15",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publicIpAllocationMethod": "[parameters('publicIpAddressType3')]"
+      }
+    },
+    {
+      "name": "[parameters('publicIpAddressName4')]",
+      "type": "Microsoft.Network/publicIpAddresses",
+      "apiVersion": "2015-06-15",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publicIpAllocationMethod": "[parameters('publicIpAddressType4')]"
+      }
+    },
+    {
+      "name": "[parameters('publicIpAddressName7')]",
+      "type": "Microsoft.Network/publicIpAddresses",
+      "apiVersion": "2015-06-15",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publicIpAllocationMethod": "[parameters('publicIpAddressType7')]"
+      }
+    },
+    {
+      "name": "[parameters('nicf100Name')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-03-30",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIpAddressName1'))]"
+      ],
+      "tags": {
+        "displayName": "nicf100"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameFront'))]"
+              },
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIpAddresses', parameters('publicIpAddressName1'))]"
+              },
+              "subnet": {
+                "id": "[variables('frontEndSubnetRef')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[parameters('networkInterfaceNameFront1')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-03-30",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+      ],
+      "tags": {
+        "displayName": "nicf1"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIpAddress": {
+                "id": "[resourceId(resourceGroup(),'Microsoft.Network/publicIpAddresses', parameters('publicIpAddressName1'))]"
+              },
+              "subnet": {
+                "id": "[variables('frontEndSubnetRef')]"
+              },
+              "networkSecurityGroup": {
+                "id": "[resourceId(resourceGroup(), 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameFront'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[parameters('networkInterfaceNameBack1')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-03-30",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+      ],
+      "tags": {
+        "displayName": "nicb1"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIpAddress": "[parameters('rrasBackendIpAddress')]",
+              "subnet": {
+                "id": "[variables('backEndSubnetRef')]"
+              },
+              "networkSecurityGroup": {
+                "id": "[resourceId(resourceGroup(), 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameBack'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[parameters('networkInterfaceNameFront2')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2016-03-30",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/publicIpAddresses/', parameters('publicIpAddressName2'))]",
+        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameFront'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[variables('frontEndSubnetRef')]"
+              },
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIpAddress": {
+                "id": "[resourceId(resourceGroup(),'Microsoft.Network/publicIpAddresses', parameters('publicIpAddressName2'))]"
+              },
+              "networkSecurityGroup": {
+                "id": "[resourceId(resourceGroup(), 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameFront'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[parameters('networkInterfaceNameBack2')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2016-03-30",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameBack'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[variables('backEndSubnetRef')]"
+              },
+              "enableIPForwarding": true,
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[parameters('proxyBackendIpAddress')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId(resourceGroup(), 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameBack'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[parameters('networkInterfaceNameFront3')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2016-03-30",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/publicIpAddresses/', parameters('publicIpAddressName3'))]",
+        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameFront'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[variables('frontEndSubnetRef')]"
+              },
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIpAddress": {
+                "id": "[resourceId(resourceGroup(),'Microsoft.Network/publicIpAddresses', parameters('publicIpAddressName3'))]"
+              },
+              "networkSecurityGroup": {
+                "id": "[resourceId(resourceGroup(), 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameFront'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[parameters('networkInterfaceNameBack3')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2016-03-30",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameBack'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[variables('backEndSubnetRef')]"
+              },
+              "privateIPAllocationMethod": "Dynamic",
+              "networkSecurityGroup": {
+                "id": "[resourceId(resourceGroup(), 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameBack'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[parameters('networkInterfaceNameFront4')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2016-03-30",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/publicIpAddresses/', parameters('publicIpAddressName4'))]",
+        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameFront'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[variables('frontEndSubnetRef')]"
+              },
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIpAddress": {
+                "id": "[resourceId(resourceGroup(),'Microsoft.Network/publicIpAddresses', parameters('publicIpAddressName4'))]"
+              },
+              "networkSecurityGroup": {
+                "id": "[resourceId(resourceGroup(), 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameFront'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[parameters('networkInterfaceNameBack4')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2016-03-30",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameBack'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[variables('backEndSubnetRef')]"
+              },
+              "privateIPAllocationMethod": "Dynamic",
+              "networkSecurityGroup": {
+                "id": "[resourceId(resourceGroup(), 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameBack'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[parameters('networkInterfaceNameBack5')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2016-03-30",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameBack'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[variables('backEndSubnetRef')]"
+              },
+              "privateIPAllocationMethod": "Dynamic",
+              "networkSecurityGroup": {
+                "id": "[resourceId(resourceGroup(), 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameBack'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[parameters('networkInterfaceNameBack6')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2016-03-30",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameBack'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[variables('backEndSubnetRef')]"
+              },
+              "privateIPAllocationMethod": "Dynamic",
+              "networkSecurityGroup": {
+                "id": "[resourceId(resourceGroup(), 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameBack'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[parameters('networkInterfaceNameFront7')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2016-03-30",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameFront'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[variables('frontEndSubnetRef')]"
+              },
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIpAddress": {
+                "id": "[resourceId(resourceGroup(),'Microsoft.Network/publicIpAddresses', parameters('publicIpAddressName7'))]"
+              },
+              "networkSecurityGroup": {
+                "id": "[resourceId(resourceGroup(), 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameFront'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[parameters('networkInterfaceNameBack8')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2016-03-30",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameBack'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[variables('backEndSubnetRef')]"
+              },
+              "privateIPAllocationMethod": "Dynamic",
+              "networkSecurityGroup": {
+                "id": "[resourceId(resourceGroup(), 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameBack'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "[parameters('virtualMachineName1')]",
       "type": "Microsoft.Compute/virtualMachines",
-      "apiVersion": "[variables('apiVer')]",
+      "apiVersion": "2015-06-15",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[concat('Microsoft.Network/networkInterfaces/', parameters('networkInterfaceNameFront1'))]",
@@ -582,7 +1181,7 @@
     {
       "name": "[parameters('virtualMachineName2')]",
       "type": "Microsoft.Compute/virtualMachines",
-      "apiVersion": "[variables('apiVer')]",
+      "apiVersion": "2015-06-15",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[concat('Microsoft.Network/networkInterfaces/', parameters('networkInterfaceNameFront2'))]",
@@ -641,7 +1240,7 @@
     {
       "name": "[parameters('virtualMachineName3')]",
       "type": "Microsoft.Compute/virtualMachines",
-      "apiVersion": "[variables('apiVer')]",
+      "apiVersion": "2015-06-15",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[concat('Microsoft.Network/networkInterfaces/', parameters('networkInterfaceNameBack3'))]",
@@ -694,7 +1293,7 @@
     {
       "name": "[parameters('virtualMachineName4')]",
       "type": "Microsoft.Compute/virtualMachines",
-      "apiVersion": "[variables('apiVer')]",
+      "apiVersion": "2015-06-15",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[concat('Microsoft.Network/networkInterfaces/', parameters('networkInterfaceNameBack4'))]",
@@ -748,7 +1347,7 @@
     {
       "name": "[parameters('virtualMachineName5')]",
       "type": "Microsoft.Compute/virtualMachines",
-      "apiVersion": "[variables('apiVer')]",
+      "apiVersion": "2015-06-15",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[concat('Microsoft.Network/networkInterfaces/', parameters('networkInterfaceNameBack5'))]",
@@ -801,7 +1400,7 @@
     {
       "name": "[parameters('virtualMachineName6')]",
       "type": "Microsoft.Compute/virtualMachines",
-      "apiVersion": "[variables('apiVer')]",
+      "apiVersion": "2015-06-15",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[concat('Microsoft.Network/networkInterfaces/', parameters('networkInterfaceNameBack6'))]",
@@ -854,7 +1453,7 @@
     {
       "name": "[parameters('virtualMachineName7')]",
       "type": "Microsoft.Compute/virtualMachines",
-      "apiVersion": "[variables('apiVer')]",
+      "apiVersion": "2015-06-15",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[concat('Microsoft.Network/networkInterfaces/', parameters('networkInterfaceNameFront7'))]",
@@ -907,7 +1506,7 @@
     {
       "name": "[parameters('virtualMachineName8')]",
       "type": "Microsoft.Compute/virtualMachines",
-      "apiVersion": "[variables('apiVer')]",
+      "apiVersion": "2015-06-15",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[concat('Microsoft.Network/networkInterfaces/', parameters('networkInterfaceNameBack8'))]",
@@ -958,482 +1557,7 @@
       }
     },
     {
-      "name": "[parameters('networkInterfaceNameFront1')]",
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "[variables('apiVer')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "apiVersion",
-        "[variables('apiVer')]",
-        "[concat('Microsoft.Network/publicIpAddresses/', parameters('publicIpAddressName1'))]",
-        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameFront'))]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "subnet": {
-                "id": "[variables('frontEndSubnetRef')]"
-              },
-              "privateIPAllocationMethod": "Dynamic",
-              "publicIpAddress": {
-                "id": "[resourceId(resourceGroup(),'Microsoft.Network/publicIpAddresses', parameters('publicIpAddressName1'))]"
-              },
-              "networkSecurityGroup": {
-                "id": "[resourceId(resourceGroup(), 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameFront'))]"
-              }
-            }
-          }
-        ],
-        "networkSecurityGroup": {
-          "id": "[resourceId(resourceGroup(), 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameFront'))]"
-        }
-      }
-    },
-    {
-      "name": "[parameters('networkInterfaceNameBack1')]",
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "[variables('apiVer')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameBack'))]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "subnet": {
-                "id": "[variables('backEndSubnetRef')]"
-              },
-              "enableIPForwarding": true,
-              "privateIPAllocationMethod": "Static",
-              "privateIPAddress": "[parameters('rrasBackendIpAddress')]"
-            }
-          }
-        ],
-        "networkSecurityGroup": {
-          "id": "[resourceId(resourceGroup(), 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameBack'))]"
-        }
-      }
-    },
-    {
-      "name": "[parameters('networkInterfaceNameFront2')]",
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "[variables('apiVer')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/publicIpAddresses/', parameters('publicIpAddressName2'))]",
-        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameFront'))]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "subnet": {
-                "id": "[variables('frontEndSubnetRef')]"
-              },
-              "privateIPAllocationMethod": "Dynamic",
-              "publicIpAddress": {
-                "id": "[resourceId(resourceGroup(),'Microsoft.Network/publicIpAddresses', parameters('publicIpAddressName2'))]"
-              }
-            }
-          }
-        ],
-        "networkSecurityGroup": {
-          "id": "[resourceId(resourceGroup(), 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameFront'))]"
-        }
-      }
-    },
-    {
-      "name": "[parameters('networkInterfaceNameBack2')]",
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "[variables('apiVer')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameBack'))]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "subnet": {
-                "id": "[variables('backEndSubnetRef')]"
-              },
-              "enableIPForwarding": true,
-              "privateIPAllocationMethod": "Static",
-              "privateIPAddress": "[parameters('proxyBackendIpAddress')]"
-            }
-          }
-        ],
-        "networkSecurityGroup": {
-          "id": "[resourceId(resourceGroup(), 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameBack'))]"
-        }
-      }
-    },
-    {
-      "name": "[parameters('networkInterfaceNameFront3')]",
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "[variables('apiVer')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/publicIpAddresses/', parameters('publicIpAddressName3'))]",
-        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameFront'))]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "subnet": {
-                "id": "[variables('frontEndSubnetRef')]"
-              },
-              "privateIPAllocationMethod": "Dynamic",
-              "publicIpAddress": {
-                "id": "[resourceId(resourceGroup(),'Microsoft.Network/publicIpAddresses', parameters('publicIpAddressName3'))]"
-              }
-            }
-          }
-        ],
-        "networkSecurityGroup": {
-          "id": "[resourceId(resourceGroup(), 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameFront'))]"
-        }
-      }
-    },
-    {
-      "name": "[parameters('networkInterfaceNameBack3')]",
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "[variables('apiVer')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameBack'))]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "subnet": {
-                "id": "[variables('backEndSubnetRef')]"
-              },
-              "privateIPAllocationMethod": "Dynamic"
-            }
-          }
-        ],
-        "networkSecurityGroup": {
-          "id": "[resourceId(resourceGroup(), 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameBack'))]"
-        }
-      }
-    },
-    {
-      "name": "[parameters('networkInterfaceNameFront4')]",
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "[variables('apiVer')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/publicIpAddresses/', parameters('publicIpAddressName4'))]",
-        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameFront'))]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "subnet": {
-                "id": "[variables('frontEndSubnetRef')]"
-              },
-              "privateIPAllocationMethod": "Dynamic",
-              "publicIpAddress": {
-                "id": "[resourceId(resourceGroup(),'Microsoft.Network/publicIpAddresses', parameters('publicIpAddressName4'))]"
-              }
-            }
-          }
-        ],
-        "networkSecurityGroup": {
-          "id": "[resourceId(resourceGroup(), 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameFront'))]"
-        }
-      }
-    },
-    {
-      "name": "[parameters('networkInterfaceNameBack4')]",
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "[variables('apiVer')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameBack'))]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "subnet": {
-                "id": "[variables('backEndSubnetRef')]"
-              },
-              "privateIPAllocationMethod": "Dynamic"
-            }
-          }
-        ],
-        "networkSecurityGroup": {
-          "id": "[resourceId(resourceGroup(), 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameBack'))]"
-        }
-      }
-    },
-    {
-      "name": "[parameters('networkInterfaceNameBack5')]",
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "[variables('apiVer')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameBack'))]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "subnet": {
-                "id": "[variables('backEndSubnetRef')]"
-              },
-              "privateIPAllocationMethod": "Dynamic"
-            }
-          }
-        ],
-        "networkSecurityGroup": {
-          "id": "[resourceId(resourceGroup(), 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameBack'))]"
-        }
-      }
-    },
-    {
-      "name": "[parameters('networkInterfaceNameBack6')]",
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "[variables('apiVer')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameBack'))]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "subnet": {
-                "id": "[variables('backEndSubnetRef')]"
-              },
-              "privateIPAllocationMethod": "Dynamic"
-            }
-          }
-        ],
-        "networkSecurityGroup": {
-          "id": "[resourceId(resourceGroup(), 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameBack'))]"
-        }
-      }
-    },
-    {
-      "name": "[parameters('networkInterfaceNameFront7')]",
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "[variables('apiVer')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameFront'))]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "subnet": {
-                "id": "[variables('frontEndSubnetRef')]"
-              },
-              "privateIPAllocationMethod": "Dynamic",
-              "publicIpAddress": {
-                "id": "[resourceId(resourceGroup(),'Microsoft.Network/publicIpAddresses', parameters('publicIpAddressName7'))]"
-              }
-            }
-          }
-        ],
-        "networkSecurityGroup": {
-          "id": "[resourceId(resourceGroup(), 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameFront'))]"
-        }
-      }
-    },
-    {
-      "name": "[parameters('networkInterfaceNameBack8')]",
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "[variables('apiVer')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameBack'))]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "subnet": {
-                "id": "[variables('backEndSubnetRef')]"
-              },
-              "privateIPAllocationMethod": "Dynamic"
-            }
-          }
-        ],
-        "networkSecurityGroup": {
-          "id": "[resourceId(resourceGroup(), 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameBack'))]"
-        }
-      }
-    },
-    {
-      "name": "[parameters('publicIpAddressName1')]",
-      "type": "Microsoft.Network/publicIpAddresses",
-      "apiVersion": "[variables('apiVer')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "publicIpAllocationMethod": "[parameters('publicIpAddressType1')]"
-      }
-    },
-    {
-      "name": "[parameters('publicIpAddressName2')]",
-      "type": "Microsoft.Network/publicIpAddresses",
-      "apiVersion": "[variables('apiVer')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "publicIpAllocationMethod": "[parameters('publicIpAddressType2')]"
-      }
-    },
-    {
-      "name": "[parameters('publicIpAddressName3')]",
-      "type": "Microsoft.Network/publicIpAddresses",
-      "apiVersion": "[variables('apiVer')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "publicIpAllocationMethod": "[parameters('publicIpAddressType3')]"
-      }
-    },
-    {
-      "name": "[parameters('publicIpAddressName4')]",
-      "type": "Microsoft.Network/publicIpAddresses",
-      "apiVersion": "[variables('apiVer')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "publicIpAllocationMethod": "[parameters('publicIpAddressType4')]"
-      }
-    },
-    {
-      "name": "[parameters('publicIpAddressName7')]",
-      "type": "Microsoft.Network/publicIpAddresses",
-      "apiVersion": "[variables('apiVer')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "publicIpAllocationMethod": "[parameters('publicIpAddressType7')]"
-      }
-    },
-    {
-      "name": "[parameters('networkSecurityGroupNameFront')]",
-      "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "[variables('apiVer')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "securityRules": [
-          {
-            "name": "default-allow-rdp",
-            "properties": {
-              "priority": 1000,
-              "sourceAddressPrefix": "*",
-              "protocol": "TCP",
-              "destinationPortRange": "3389",
-              "access": "Allow",
-              "direction": "Inbound",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*"
-            }
-          },
-          {
-            "name": "http-rule",
-            "properties": {
-              "description": "Allow HTTP",
-              "protocol": "Tcp",
-              "sourcePortRange": "*",
-              "destinationPortRange": "80",
-              "sourceAddressPrefix": "Internet",
-              "destinationAddressPrefix": "*",
-              "access": "Allow",
-              "priority": 101,
-              "direction": "Inbound"
-            }
-          },
-          {
-            "name": "https-rule",
-            "properties": {
-              "description": "Allow HTTPS",
-              "protocol": "Tcp",
-              "sourcePortRange": "*",
-              "destinationPortRange": "443",
-              "sourceAddressPrefix": "Internet",
-              "destinationAddressPrefix": "*",
-              "access": "Allow",
-              "priority": 102,
-              "direction": "Inbound"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "[parameters('networkSecurityGroupNameBack')]",
-      "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "[variables('apiVer')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "securityRules": [
-          {
-            "name": "default-allow-rdp",
-            "properties": {
-              "priority": 1000,
-              "sourceAddressPrefix": "*",
-              "protocol": "TCP",
-              "destinationPortRange": "3389",
-              "access": "Allow",
-              "direction": "Inbound",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*"
-            }
-          },
-          {
-            "name": "allow-frontend",
-            "properties": {
-              "description": "Allow Front End Subnet",
-              "protocol": "Tcp",
-              "sourcePortRange": "*",
-              "destinationPortRange": "*",
-              "sourceAddressPrefix": "[parameters('subnetName1prefix')]",
-              "destinationAddressPrefix": "*",
-              "access": "Allow",
-              "priority": 100,
-              "direction": "Inbound"
-            }
-          },
-          {
-            "name": "block-internet",
-            "properties": {
-              "description": "Block Internet",
-              "protocol": "*",
-              "sourcePortRange": "*",
-              "destinationPortRange": "*",
-              "sourceAddressPrefix": "*",
-              "destinationAddressPrefix": "Internet",
-              "access": "Deny",
-              "priority": 100,
-              "direction": "Outbound"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "apiVersion": "[variables('apiVer')]",
+      "apiVersion": "2015-06-15",
       "type": "Microsoft.Network/routeTables",
       "name": "[parameters('backEndRouteTableName')]",
       "location": "[resourceGroup().location]",
@@ -1454,7 +1578,7 @@
       }
     },
     {
-      "apiVersion": "[variables('apiVer')]",
+      "apiVersion": "2015-06-15",
       "type": "Microsoft.Network/routeTables",
       "name": "[parameters('frontEndRouteTableName')]",
       "location": "[resourceGroup().location]",
@@ -1469,45 +1593,6 @@
               "addressPrefix": "[parameters('subnetName2prefix')]",
               "nextHopType": "VirtualAppliance",
               "nextHopIpAddress": "[parameters('rrasBackendIpAddress')]"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "apiVersion": "[variables('apiVer')]",
-      "type": "Microsoft.Network/virtualNetworks",
-      "name": "[parameters('virtualNetworkName')]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameFront'))]",
-        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameBack'))]",
-        "[concat('Microsoft.Network/routeTables/', parameters('frontEndRouteTableName'))]",
-        "[concat('Microsoft.Network/routeTables/', parameters('backEndRouteTableName'))]"
-      ],
-      "properties": {
-        "addressSpace": {
-          "addressPrefixes": [
-            "[parameters('virtualNetworkAddressRange')]"
-          ]
-        },
-        "subnets": [
-          {
-            "name": "[parameters('subnetName1')]",
-            "properties": {
-              "addressPrefix": "[parameters('subnetName1prefix')]",
-              "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameFront'))]"
-              }
-            }
-          },
-          {
-            "name": "[parameters('subnetName2')]",
-            "properties": {
-              "addressPrefix": "[parameters('subnetName2prefix')]",
-              "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameBack'))]"
-              }
             }
           }
         ]
